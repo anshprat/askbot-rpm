@@ -1,6 +1,6 @@
 Name:           askbot
 Version:        0.7.7
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Question and Answer forum
 Group:          Development/Languages
 License:        GPLv3+
@@ -13,7 +13,7 @@ Requires:       Django Django-south
 Requires:       django-keyedcache django-robots django-countries django-celery
 Requires:       django-kombu django-recaptcha django-threaded-multihost 
 Requires:       python-html5lib python-oauth2 python-coffin python-markdown2  
-Requires:       python-recaptcha-client python-grapefruit
+Requires:       python-recaptcha-client python-grapefruit MySQL-python
 Requires:       python-unidecode python-httplib2 python-dateutil python-psycopg2
 # optional dependencies
 Requires:       django-followit django-avatar
@@ -36,16 +36,16 @@ Features:
 %patch0 -p1
 
 # remove unneeded doc
-rm -rf askbot/doc/askbot-docs.zip
+rm -rf %{name}/doc/askbot-docs.zip
 
 # remove bundled deps
 rm -rf %{name}/deps/grapefruit.py
 rm -rf %{name}/deps/recaptcha_django
-rm -rf %{name}/deps/openid
 
 # remove empty files
 rm -rf %{name}/doc/build/html/.buildinfo
 rm -rf %{name}/skins/default/media/images/flags/.DS_Store
+rm -rf %{name}/deps/livesettings/locale/es/LC_MESSAGES/django.po
 
 # fix permission issues
 chmod -x %{name}/skins/README
@@ -76,7 +76,7 @@ sed -i -e '1d' %{buildroot}%{python_sitelib}/%{name}/setup_templates/manage.py
 sed -i -e '1d' %{buildroot}%{python_sitelib}/%{name}/bin/show_profile_stats.py
 sed -i -e '1d' %{buildroot}%{python_sitelib}/%{name}/bin/generate_modules.py 
 sed -i -e '1d' %{buildroot}%{python_sitelib}/%{name}/cron/askbot_cron_job
-
+sed -i -e '1d' %{buildroot}%{python_sitelib}/%{name}/deps/openid/test/test_yadis_discover.py
 # remove empty files
 rm -rf %{buildroot}%{python_sitelib}/%{name}/version.*
 rm -rf %{buildroot}%{python_sitelib}/%{name}/setup_templates/log/askbot.log
@@ -117,6 +117,7 @@ chmod -x %{buildroot}%{python_sitelib}/%{name}/bin/rmpyc
 %{python_sitelib}/%{name}/deps/*.py*
 %{python_sitelib}/%{name}/deps/README
 %{python_sitelib}/%{name}/deps/django_authopenid/
+%{python_sitelib}/%{name}/deps/openid/
 %dir %{python_sitelib}/%{name}/deps/livesettings/
 %dir %{python_sitelib}/%{name}/deps/livesettings/locale/
 %{python_sitelib}/%{name}/deps/livesettings/*.py*
@@ -132,6 +133,9 @@ chmod -x %{buildroot}%{python_sitelib}/%{name}/bin/rmpyc
 %{python_sitelib}/askbot*.egg-info
 
 %changelog
+* Wed Jul 18 2011 Rahul Sundaram <sundaram@fedoraproject.org> - 0.7.7-3
+- Add requires on MySQL-python. Don't remove openid
+
 * Mon Jul 18 2011 Rahul Sundaram <sundaram@fedoraproject.org> - 0.7.7-2
 - Changes from Praveen Kumar to fix all relevant rpmlint warnings and errors
 
