@@ -1,0 +1,101 @@
+diff --git a/askbot/conf/skin_counter_settings.py b/askbot/conf/skin_counter_settings.py
+index 7601a7a..e45e254 100644
+--- a/askbot/conf/skin_counter_settings.py
++++ b/askbot/conf/skin_counter_settings.py
+@@ -4,7 +4,10 @@ Skin settings to color view, vote and answer counters
+ from askbot.conf.settings_wrapper import settings
+ from askbot.deps.livesettings import ConfigurationGroup, IntegerValue, StringValue
+ from django.utils.translation import ugettext as _
+-from askbot.deps.grapefruit import Color
++try:
++    from grapefruit import Color
++except Exception, e:
++    from askbot.deps.grapefruit import Color
+ 
+ SKIN_COUNTER_SETTINGS = ConfigurationGroup(
+                             'SKIN_COUNTER_SETTINGS',
+diff --git a/askbot/forms.py b/askbot/forms.py
+index 57775ed..60941ca 100644
+--- a/askbot/forms.py
++++ b/askbot/forms.py
+@@ -10,7 +10,10 @@ from django.contrib.contenttypes.models import ContentType
+ from django_countries import countries
+ from askbot.utils.forms import NextUrlField, UserNameField
+ from askbot.utils.mail import extract_first_email_address
+-from askbot.deps.recaptcha_django import ReCaptchaField
++try:
++    from recaptcha_django import ReCaptchaField
++except Exception,e:
++    from askbot.deps.recaptcha_django import ReCaptchaField
+ from askbot.conf import settings as askbot_settings
+ import logging
+ 
+diff --git a/askbot/setup_templates/settings.py b/askbot/setup_templates/settings.py
+index 6f895ea..d6e921e 100644
+--- a/askbot/setup_templates/settings.py
++++ b/askbot/setup_templates/settings.py
+@@ -103,7 +103,7 @@ MIDDLEWARE_CLASSES = (
+     'askbot.middleware.anon_user.ConnectToSessionMessagesMiddleware',
+     'askbot.middleware.pagesize.QuestionsPageSizeMiddleware',
+     'askbot.middleware.cancel.CancelActionMiddleware',
+-    'askbot.deps.recaptcha_django.middleware.ReCaptchaMiddleware',
++    'recaptcha_django.middleware.ReCaptchaMiddleware',
+     'django.middleware.transaction.TransactionMiddleware',
+     #'debug_toolbar.middleware.DebugToolbarMiddleware',
+     'askbot.middleware.view_log.ViewLogMiddleware',
+diff --git a/askbot/startup_procedures.py b/askbot/startup_procedures.py
+index 63737ac..0b92ec2 100644
+--- a/askbot/startup_procedures.py
++++ b/askbot/startup_procedures.py
+@@ -53,14 +53,30 @@ def test_middleware():
+     installed in the django settings.py file. If that is not the
+     case - raises an ImproperlyConfigured exception.
+     """
+-    required_middleware = (
++
++    recaptcha_django_syscopy = 0
++    try:
++        import recaptcha_django
++        recaptcha_django_syscopy = 1
++    except Exception, e:
++        pass
++
++    required_middleware_list = [
+         'askbot.middleware.anon_user.ConnectToSessionMessagesMiddleware',
+         'askbot.middleware.pagesize.QuestionsPageSizeMiddleware',
+         'askbot.middleware.cancel.CancelActionMiddleware',
+-        'askbot.deps.recaptcha_django.middleware.ReCaptchaMiddleware',
+         'django.middleware.transaction.TransactionMiddleware',
+         'askbot.middleware.view_log.ViewLogMiddleware',
+-    )
++    ]
++
++    recaptcha_str = 'recaptcha_django.middleware.ReCaptchaMiddleware'
++    if recaptcha_django_syscopy == 0:
++        required_middleware_list.append('askbot.deps.' + recaptcha_str)
++    elif recaptcha_django_syscopy == 1:
++        required_middleware_list.append(recaptcha_str)
++
++    required_middleware = tuple(required_middleware_list)
++
+     #'debug_toolbar.middleware.DebugToolbarMiddleware',
+     missing_middleware = list()
+     for middleware in required_middleware:
+@@ -107,3 +123,4 @@ def run():
+         transaction.commit()
+     except:
+         transaction.rollback()
++
+diff --git a/askbot/utils/colors.py b/askbot/utils/colors.py
+index 9ca8ba7..1611b15 100644
+--- a/askbot/utils/colors.py
++++ b/askbot/utils/colors.py
+@@ -1,4 +1,7 @@
+-from askbot.deps.grapefruit import Color
++try:
++    from grapefruit import Color
++except Exception, e:
++    from askbot.deps.grapefruit import Color
+ import keyedcache
+ import math
+ 
