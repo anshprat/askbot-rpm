@@ -1,21 +1,22 @@
 Name:           askbot
-Version:        0.7.7
-Release:        3%{?dist}
+Version:        0.7.12
+Release:        1%{?dist}
 Summary:        Question and Answer forum
 Group:          Development/Languages
 License:        GPLv3+
 URL:            http://pypi.python.org/pypi/%{name}
 Source0:        http://pypi.python.org/packages/source/a/%{name}/%{name}-%{version}.tar.gz
-Patch0:         use_system_modules.patch
 BuildArch:      noarch
 BuildRequires:  python-setuptools python-devel gettext
-Requires:       Django Django-south 
+
+Requires:       Django Django-south  
 Requires:       django-keyedcache django-robots django-countries django-celery
 Requires:       django-kombu django-recaptcha django-threaded-multihost 
 Requires:       python-html5lib python-oauth2 python-coffin python-markdown2  
-Requires:       python-recaptcha-client python-grapefruit MySQL-python
+Requires:       python-recaptcha-client MySQL-python python-openid python-amqplib
 Requires:       python-unidecode python-httplib2 python-dateutil python-psycopg2
-# optional dependencies
+Requires:       django-recaptcha-works django-picklefield
+# optional dependencies 
 Requires:       django-followit django-avatar
 
 %description
@@ -33,19 +34,19 @@ Features:
 
 %prep
 %setup -q 
-%patch0 -p1
 
-# remove unneeded doc
-rm -rf %{name}/doc/askbot-docs.zip
+# move license file to base
+mv %{name}/LICENSE .
 
-# remove bundled deps
-rm -rf %{name}/deps/grapefruit.py
-rm -rf %{name}/deps/recaptcha_django
+# remove outdated bundled docs
+rm -rf %{name}/doc
+rm -rf %{name}/docs
 
 # remove empty files
-rm -rf %{name}/doc/build/html/.buildinfo
 rm -rf %{name}/skins/default/media/images/flags/.DS_Store
 rm -rf %{name}/deps/livesettings/locale/es/LC_MESSAGES/django.po
+rm -rf %{name}/setup_templates/log/askbot.log
+rm -rf %{name}/version.py
 
 # fix permission issues
 chmod -x %{name}/skins/README
@@ -58,6 +59,14 @@ chmod -x %{name}/skins/default/media/jquery-openid/openid.css
 chmod -x %{name}/skins/default/media/js/wmd/wmd-test.html
 chmod -x %{name}/skins/default/media/jquery-openid/jquery.openid.js
 chmod -x %{name}/skins/default/media/js/wmd/wmd.css
+chmod -x %{name}/bin/rmpyc
+
+# remove shebang
+sed -i -e '1d' %{name}/utils/diff.py
+sed -i -e '1d' %{name}/setup_templates/manage.py
+sed -i -e '1d' %{name}/bin/show_profile_stats.py
+sed -i -e '1d' %{name}/bin/generate_modules.py
+sed -i -e '1d' %{name}/cron/askbot_cron_job
 
 %build
 %{__python} setup.py build
@@ -70,33 +79,13 @@ chmod -x %{name}/skins/default/media/js/wmd/wmd.css
   's:\(.*/locale/\)\([^/_]\+\)\(.*\.mo$\):%lang(\2) \1\2\3:' \
   >> %{name}.lang
 
-# remove shebang 
-sed -i -e '1d' %{buildroot}%{python_sitelib}/%{name}/utils/diff.py
-sed -i -e '1d' %{buildroot}%{python_sitelib}/%{name}/setup_templates/manage.py
-sed -i -e '1d' %{buildroot}%{python_sitelib}/%{name}/bin/show_profile_stats.py
-sed -i -e '1d' %{buildroot}%{python_sitelib}/%{name}/bin/generate_modules.py 
-sed -i -e '1d' %{buildroot}%{python_sitelib}/%{name}/cron/askbot_cron_job
-sed -i -e '1d' %{buildroot}%{python_sitelib}/%{name}/deps/openid/test/test_yadis_discover.py
-# remove empty files
-rm -rf %{buildroot}%{python_sitelib}/%{name}/version.*
-rm -rf %{buildroot}%{python_sitelib}/%{name}/setup_templates/log/askbot.log
-rm -rf %{buildroot}%{_defaultdocdir}/%{name}-%{version}/doc/build/html/.buildinfo
-
-# fix permission issues
-chmod -x %{buildroot}%{python_sitelib}/%{name}/skins/README
-chmod -x %{buildroot}%{python_sitelib}/%{name}/setup_templates/upfiles/README
-chmod -x %{buildroot}%{python_sitelib}/%{name}/views/README
-chmod -x %{buildroot}%{python_sitelib}/%{name}/bin/rmpyc
-
 
 %files -f %{name}.lang 
-%doc askbot/doc/ askbot/docs/
-
+%doc PKG-INFO LICENSE
 %{_bindir}/startforum
 %dir %{python_sitelib}/%{name}/
 %dir %{python_sitelib}/%{name}/locale/
 %{python_sitelib}/%{name}/*.py*
-%{python_sitelib}/%{name}/LICENSE
 %{python_sitelib}/%{name}/bin/
 %{python_sitelib}/%{name}/conf/
 %{python_sitelib}/%{name}/const/
@@ -108,8 +97,6 @@ chmod -x %{buildroot}%{python_sitelib}/%{name}/bin/rmpyc
 %{python_sitelib}/%{name}/utils/
 %{python_sitelib}/%{name}/views/
 %{python_sitelib}/%{name}/setup_templates/
-%{python_sitelib}/%{name}/doc/
-%{python_sitelib}/%{name}/docs/
 %{python_sitelib}/%{name}/migrations/
 %{python_sitelib}/%{name}/models/
 %{python_sitelib}/%{name}/management/
@@ -117,7 +104,6 @@ chmod -x %{buildroot}%{python_sitelib}/%{name}/bin/rmpyc
 %{python_sitelib}/%{name}/deps/*.py*
 %{python_sitelib}/%{name}/deps/README
 %{python_sitelib}/%{name}/deps/django_authopenid/
-%{python_sitelib}/%{name}/deps/openid/
 %dir %{python_sitelib}/%{name}/deps/livesettings/
 %dir %{python_sitelib}/%{name}/deps/livesettings/locale/
 %{python_sitelib}/%{name}/deps/livesettings/*.py*
@@ -133,11 +119,37 @@ chmod -x %{buildroot}%{python_sitelib}/%{name}/bin/rmpyc
 %{python_sitelib}/askbot*.egg-info
 
 %changelog
+* Wed Aug 03 2011 Rahul Sundaram <sundaram@fedoraproject.org> - 0.7.12-1
+- new upstream release
+- another fix for a unicode issue
+- consolidate removal of empty files, executable bits and shebang in prep
+- remove outdated bundled documentation
+
+* Wed Aug 03 2011 Rahul Sundaram <sundaram@fedoraproject.org> - 0.7.11-1
+- new upstream release
+- fixes a couple of minor bugs reported by me
+
+* Mon Aug 01 2011 Rahul Sundaram <sundaram@fedoraproject.org> - 0.7.10-1
+- new upstream release
+- fixes live search in response to problem reported by me
+- now using django-recaptcha-works module
+
+* Sun Jul 31 2011 Rahul Sundaram <sundaram@fedoraproject.org> - 0.7.9-1
+- new upstream release
+- resolves bug in the sharing footer of answerless question reported by me
+
+* Sun Jul 31 2011 Rahul Sundaram <sundaram@fedoraproject.org> - 0.7.8-1
+- new upstream release
+- use django_openid_forms.patch from PJP
+- add requires on django-picklefield and python-amqplib
+- remove requires on python-grapefruit.  Module removed upstream
+- drop all patches.  upstream removed bundled copy of python-openid
+
 * Wed Jul 18 2011 Rahul Sundaram <sundaram@fedoraproject.org> - 0.7.7-3
-- Add requires on MySQL-python. Don't remove openid
+- add requires on MySQL-python. Don't remove openid
 
 * Mon Jul 18 2011 Rahul Sundaram <sundaram@fedoraproject.org> - 0.7.7-2
-- Changes from Praveen Kumar to fix all relevant rpmlint warnings and errors
+- changes from Praveen Kumar to fix all relevant rpmlint warnings and errors
 
 * Thu Jul 14 2011 Rahul Sundaram <sundaram@fedoraproject.org> - 0.7.7-1
 - new upstream release.  
