@@ -1,5 +1,5 @@
 Name:           askbot
-Version:        0.7.12
+Version:        0.7.14
 Release:        1%{?dist}
 Summary:        Question and Answer forum
 Group:          Development/Languages
@@ -11,13 +11,15 @@ BuildRequires:  python-setuptools python-devel gettext
 
 Requires:       Django Django-south  
 Requires:       django-keyedcache django-robots django-countries django-celery
-Requires:       django-kombu django-recaptcha django-threaded-multihost 
+Requires:       django-kombu django-threaded-multihost 
 Requires:       python-html5lib python-oauth2 python-coffin python-markdown2  
 Requires:       python-recaptcha-client MySQL-python python-openid python-amqplib
 Requires:       python-unidecode python-httplib2 python-dateutil python-psycopg2
 Requires:       django-recaptcha-works django-picklefield
 # optional dependencies 
 Requires:       django-followit django-avatar
+# for building the doc
+Requires:       python-sphinx
 
 %description
 Question and Answer forum written in python and Django. It is similar to 
@@ -35,38 +37,12 @@ Features:
 %prep
 %setup -q 
 
-# move license file to base
-mv %{name}/LICENSE .
-
-# remove outdated bundled docs
-rm -rf %{name}/doc
-rm -rf %{name}/docs
-
 # remove empty files
-rm -rf %{name}/skins/default/media/images/flags/.DS_Store
-rm -rf %{name}/deps/livesettings/locale/es/LC_MESSAGES/django.po
-rm -rf %{name}/setup_templates/log/askbot.log
 rm -rf %{name}/version.py
-
-# fix permission issues
-chmod -x %{name}/skins/README
-chmod -x %{name}/setup_templates/upfiles/README
-chmod -x %{name}/views/README
-chmod -x %{name}/skins/default/media/js/wmd/*.js
-chmod -x %{name}/skins/default/media/js/*.bat
-chmod -x %{name}/skins/default/media/style/*.css
-chmod -x %{name}/skins/default/media/jquery-openid/openid.css
-chmod -x %{name}/skins/default/media/js/wmd/wmd-test.html
-chmod -x %{name}/skins/default/media/jquery-openid/jquery.openid.js
-chmod -x %{name}/skins/default/media/js/wmd/wmd.css
-chmod -x %{name}/bin/rmpyc
+rm -rf %{name}/doc/build/html/.buildinfo
 
 # remove shebang
-sed -i -e '1d' %{name}/utils/diff.py
 sed -i -e '1d' %{name}/setup_templates/manage.py
-sed -i -e '1d' %{name}/bin/show_profile_stats.py
-sed -i -e '1d' %{name}/bin/generate_modules.py
-sed -i -e '1d' %{name}/cron/askbot_cron_job
 
 %build
 %{__python} setup.py build
@@ -81,10 +57,11 @@ sed -i -e '1d' %{name}/cron/askbot_cron_job
 
 
 %files -f %{name}.lang 
-%doc PKG-INFO LICENSE
-%{_bindir}/startforum
+%doc PKG-INFO LICENSE COPYING AUTHORS 
+%{_bindir}/askbot-setup
 %dir %{python_sitelib}/%{name}/
 %dir %{python_sitelib}/%{name}/locale/
+%{python_sitelib}/%{name}/doc
 %{python_sitelib}/%{name}/*.py*
 %{python_sitelib}/%{name}/bin/
 %{python_sitelib}/%{name}/conf/
@@ -119,6 +96,13 @@ sed -i -e '1d' %{name}/cron/askbot_cron_job
 %{python_sitelib}/askbot*.egg-info
 
 %changelog
+* Thu Aug 03 2011 Rahul Sundaram <sundaram@fedoraproject.org> - 0.7.14-1
+- new upstream release.  
+- upstream has renamed startforum to askbot-setup
+- included copy of license and some documentation fixes
+- upstream removed empty files, unnecessary executable bit and shebang in files
+- drop requires on django-recaptcha since askbot uses django-recaptcha-works now
+
 * Wed Aug 03 2011 Rahul Sundaram <sundaram@fedoraproject.org> - 0.7.12-1
 - new upstream release
 - another fix for a unicode issue
