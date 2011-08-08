@@ -1,10 +1,10 @@
 Name:           askbot
-Version:        0.7.14
+Version:        0.7.15
 Release:        1%{?dist}
 Summary:        Question and Answer forum
 Group:          Development/Languages
 License:        GPLv3+
-URL:            http://pypi.python.org/pypi/%{name}
+URL:            http://askbot.org
 Source0:        http://pypi.python.org/packages/source/a/%{name}/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 BuildRequires:  python-setuptools python-devel gettext
@@ -38,7 +38,6 @@ Features:
 %setup -q 
 
 # remove empty files
-rm -rf %{name}/version.py
 rm -rf %{name}/doc/build/html/.buildinfo
 
 # remove shebang
@@ -57,7 +56,7 @@ sed -i -e '1d' %{name}/setup_templates/manage.py
 
 
 %files -f %{name}.lang 
-%doc PKG-INFO LICENSE COPYING AUTHORS 
+%doc PKG-INFO LICENSE COPYING AUTHORS README.rst
 %{_bindir}/askbot-setup
 %dir %{python_sitelib}/%{name}/
 %dir %{python_sitelib}/%{name}/locale/
@@ -96,6 +95,12 @@ sed -i -e '1d' %{name}/setup_templates/manage.py
 %{python_sitelib}/askbot*.egg-info
 
 %changelog
+* Thu Aug 07 2011 Rahul Sundaram <sundaram@fedoraproject.org> - 0.7.15-1
+- new upstream release
+- change upstream url
+- add the new readme file to doc
+- upstream dropped empty version.py file
+
 * Thu Aug 03 2011 Rahul Sundaram <sundaram@fedoraproject.org> - 0.7.14-1
 - new upstream release.  
 - upstream has renamed startforum to askbot-setup
