@@ -1,5 +1,5 @@
 Name:           askbot
-Version:        0.7.17
+Version:        0.7.18
 Release:        1%{?dist}
 Summary:        Question and Answer forum
 Group:          Development/Languages
@@ -96,6 +96,9 @@ sed -i -e '1d' %{name}/setup_templates/manage.py
 %{python_sitelib}/askbot*.egg-info
 
 %changelog
+* Thu Aug 11 2011 Rahul Sundaram <sundaram@fedoraproject.org> - 0.7.18-1
+- new upstream bugfix release includes improved notifications
+
 * Thu Aug 11 2011 Rahul Sundaram <sundaram@fedoraproject.org> - 0.7.17-1
 - new upstream release
   * fixes issue with referencing username with capitalization differences
