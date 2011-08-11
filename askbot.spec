@@ -1,5 +1,5 @@
 Name:           askbot
-Version:        0.7.15
+Version:        0.7.17
 Release:        1%{?dist}
 Summary:        Question and Answer forum
 Group:          Development/Languages
@@ -10,7 +10,7 @@ BuildArch:      noarch
 BuildRequires:  python-setuptools python-devel gettext
 
 Requires:       Django Django-south  
-Requires:       django-keyedcache django-robots django-countries django-celery
+Requires:       django-keyedcache django-robots django-countries 
 Requires:       django-kombu django-threaded-multihost 
 Requires:       python-html5lib python-oauth2 python-coffin python-markdown2  
 Requires:       python-recaptcha-client MySQL-python python-openid python-amqplib
@@ -20,6 +20,7 @@ Requires:       django-recaptcha-works django-picklefield
 Requires:       django-followit django-avatar
 # for building the doc
 Requires:       python-sphinx
+Requires:       django-celery = 2.2.7
 
 %description
 Question and Answer forum written in python and Django. It is similar to 
@@ -95,6 +96,12 @@ sed -i -e '1d' %{name}/setup_templates/manage.py
 %{python_sitelib}/askbot*.egg-info
 
 %changelog
+* Thu Aug 11 2011 Rahul Sundaram <sundaram@fedoraproject.org> - 0.7.17-1
+- new upstream release
+  * fixes issue with referencing username with capitalization differences
+  * allow admins to add others as admins 
+- requires django-celery 2.2.7
+
 * Thu Aug 07 2011 Rahul Sundaram <sundaram@fedoraproject.org> - 0.7.15-1
 - new upstream release
 - change upstream url
