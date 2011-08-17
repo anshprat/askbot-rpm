@@ -1,5 +1,5 @@
 Name:           askbot
-Version:        0.7.18
+Version:        0.7.19
 Release:        1%{?dist}
 Summary:        Question and Answer forum
 Group:          Development/Languages
@@ -96,6 +96,14 @@ sed -i -e '1d' %{name}/setup_templates/manage.py
 %{python_sitelib}/askbot*.egg-info
 
 %changelog
+* Thu Aug 17 2011 Rahul Sundaram <sundaram@fedoraproject.org> - 0.7.19-1
+- new upstream bug fix release
+  * fixes google plus and facebook login to work again
+  * some styling improvements for questions sidebar
+  * fixes moderation tab misalignment issue reported by me
+  * replaces favorite by follow in questions
+  * fixes follow user functions
+
 * Thu Aug 11 2011 Rahul Sundaram <sundaram@fedoraproject.org> - 0.7.18-1
 - new upstream bugfix release includes improved notifications
 
