@@ -1,5 +1,5 @@
 Name:           askbot
-Version:        0.7.19
+Version:        0.7.20
 Release:        1%{?dist}
 Summary:        Question and Answer forum
 Group:          Development/Languages
@@ -96,6 +96,15 @@ sed -i -e '1d' %{name}/setup_templates/manage.py
 %{python_sitelib}/askbot*.egg-info
 
 %changelog
+* Sun Aug 28 2011 Rahul Sundaram <sundaram@fedoraproject.org> - 0.7.20-1
+- new upstream release
+  * added support for login via self-hosted Wordpress site (Adolfo Fitoria)
+  * allowed basic markdown in the comments (Adolfo Fitoria)
+  * added this changelog (Adolfo Fitoria)
+  * added support for threaded emails (Benoit Lavigne)
+  * few more Spanish translation strings (Byron Corrales)
+  * social sharing support on identi.ca (Rantadeep Debnath)
+
 * Thu Aug 17 2011 Rahul Sundaram <sundaram@fedoraproject.org> - 0.7.19-1
 - new upstream bug fix release
   * fixes google plus and facebook login to work again
