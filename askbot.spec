@@ -1,11 +1,13 @@
 Name:           askbot
-Version:        0.7.20
+Version:        0.7.22
 Release:        1%{?dist}
 Summary:        Question and Answer forum
 Group:          Development/Languages
 License:        GPLv3+
 URL:            http://askbot.org
 Source0:        http://pypi.python.org/packages/source/a/%{name}/%{name}-%{version}.tar.gz
+Source1:        askbot.wsgi
+Source2:        askbot-httpd.conf
 BuildArch:      noarch
 BuildRequires:  python-setuptools python-devel gettext
 
@@ -21,6 +23,7 @@ Requires:       django-followit django-avatar
 # for building the doc
 Requires:       python-sphinx
 Requires:       django-celery = 2.2.7
+Requires:       httpd
 
 %description
 Question and Answer forum written in python and Django. It is similar to 
@@ -55,10 +58,27 @@ sed -i -e '1d' %{name}/setup_templates/manage.py
   's:\(.*/locale/\)\([^/_]\+\)\(.*\.mo$\):%lang(\2) \1\2\3:' \
   >> %{name}.lang
 
+#  add wsgi and httpd configuration files 
+mkdir -p %{buildroot}/%{_sbindir}/
+install -p -m 755 %{SOURCE1} %{buildroot}%{_sbindir}/
+
+mkdir -p %{buildroot}/%{_sysconfdir}/%{name}
+cp -r %{python_sitelib}/%{name}/setup_templates/  %{buildroot}/%{_sysconfdir}/%{name}
+
+mkdir -p %{buildroot}/%{_sysconfdir}/httpd/conf.d/
+install -p -m 644 %{SOURCE2} %{buildroot}/%{_sysconfdir}/httpd/conf.d/askbot.conf
+%if 0%{?rhel}
+sed -i 's/python2.7/python2.6/g' %{buildroot}/%{_sysconfdir}/httpd/conf.d/askbot.conf
+%endif
 
 %files -f %{name}.lang 
 %doc PKG-INFO LICENSE COPYING AUTHORS README.rst
 %{_bindir}/askbot-setup
+
+%{_sbindir}/askbot.wsgi
+%config(noreplace) %{_sysconfdir}/askbot/
+%config(noreplace) %{_sysconfdir}/httpd/conf.d/askbot.conf
+
 %dir %{python_sitelib}/%{name}/
 %dir %{python_sitelib}/%{name}/locale/
 %{python_sitelib}/%{name}/doc
@@ -96,6 +116,19 @@ sed -i -e '1d' %{name}/setup_templates/manage.py
 %{python_sitelib}/askbot*.egg-info
 
 %changelog
+* Thu Sep 01 2011 Rahul Sundaram <sundaram@fedoraproject.org> - 0.7.22-1
+- update to 0.7.22
+  * removed printing of log message on missing optional media resources (Evgeny Fadeev)
+  * fixed a layout bug on tags page (Evgeny Fadeev)
+ 
+* Thu Sep 01 2011 Rahul Sundaram <sundaram@fedoraproject.org> - 0.7.21-1
+- update to 0.7.21
+  * media resource incremented automatically (Adolfo Fitoria, Evgeny Fadeev)
+  * first user automatically becomes site administrator (Adolfo Fitoria)
+  * avatar displayed on the sidebar can be controlled with livesettings.(Adolfo Fitoria, Evgeny Fadeev)
+  * avatar box in the sidebar is ordered with priority for real faces.(Adolfo Fitoria)
+  * django's createsuperuser now works with askbot (Adolfo Fitoria)
+
 * Sun Aug 28 2011 Rahul Sundaram <sundaram@fedoraproject.org> - 0.7.20-1
 - new upstream release
   * added support for login via self-hosted Wordpress site (Adolfo Fitoria)

@@ -1,1 +1,3 @@
-bf125183ab50b999a86af27475243e97  askbot-0.7.20.tar.gz
+a73b78f29e792e8e6af247d8e8034ab9  askbot-0.7.22.tar.gz
+8a6bfa21b43e2cf0c97708ea07123288  askbot-httpd.conf
+d9c572a13e720a30bd57570483c00c8c  askbot.wsgi
