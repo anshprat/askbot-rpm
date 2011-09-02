@@ -1,6 +1,6 @@
 Name:           askbot
 Version:        0.7.22
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Question and Answer forum
 Group:          Development/Languages
 License:        GPLv3+
@@ -63,7 +63,7 @@ mkdir -p %{buildroot}/%{_sbindir}/
 install -p -m 755 %{SOURCE1} %{buildroot}%{_sbindir}/
 
 mkdir -p %{buildroot}/%{_sysconfdir}/%{name}
-cp -r %{python_sitelib}/%{name}/setup_templates/  %{buildroot}/%{_sysconfdir}/%{name}
+cp -r %{buildroot}/%{python_sitelib}/%{name}/setup_templates/  %{buildroot}/%{_sysconfdir}/%{name}
 
 mkdir -p %{buildroot}/%{_sysconfdir}/httpd/conf.d/
 install -p -m 644 %{SOURCE2} %{buildroot}/%{_sysconfdir}/httpd/conf.d/askbot.conf
@@ -116,6 +116,9 @@ sed -i 's/python2.7/python2.6/g' %{buildroot}/%{_sysconfdir}/httpd/conf.d/askbot
 %{python_sitelib}/askbot*.egg-info
 
 %changelog
+* Fri Sep 02 2011 Rahul Sundaram <sundaram@fedoraproject.org> - 0.7.22-2
+- Fix copying of template files
+
 * Thu Sep 01 2011 Rahul Sundaram <sundaram@fedoraproject.org> - 0.7.22-1
 - update to 0.7.22
   * removed printing of log message on missing optional media resources (Evgeny Fadeev)
