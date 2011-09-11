@@ -1,13 +1,15 @@
 Name:           askbot
 Version:        0.7.22
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Question and Answer forum
 Group:          Development/Languages
 License:        GPLv3+
 URL:            http://askbot.org
 Source0:        http://pypi.python.org/packages/source/a/%{name}/%{name}-%{version}.tar.gz
 Source1:        askbot.wsgi
-Source2:        askbot-httpd.conf
+Source2:        askbot-settings.py
+Source3:        askbot-httpd.conf
+Source4:        README.fedora
 BuildArch:      noarch
 BuildRequires:  python-setuptools python-devel gettext
 
@@ -16,7 +18,7 @@ Requires:       django-keyedcache django-robots django-countries
 Requires:       django-kombu django-threaded-multihost 
 Requires:       python-html5lib python-oauth2 python-coffin python-markdown2  
 Requires:       python-recaptcha-client MySQL-python python-openid python-amqplib
-Requires:       python-unidecode python-httplib2 python-dateutil python-psycopg2
+Requires:       python-unidecode python-httplib2 python-psycopg2
 Requires:       django-recaptcha-works django-picklefield
 # optional dependencies 
 Requires:       django-followit django-avatar
@@ -24,6 +26,11 @@ Requires:       django-followit django-avatar
 Requires:       python-sphinx
 Requires:       django-celery = 2.2.7
 Requires:       httpd
+%if 0%{?rhel}
+Requires:       python-dateutil15
+%else
+Requires:       python-dateutil
+%endif
 
 %description
 Question and Answer forum written in python and Django. It is similar to 
@@ -41,7 +48,7 @@ Features:
 %prep
 %setup -q 
 
-# remove empty files
+# remove empty file
 rm -rf %{name}/doc/build/html/.buildinfo
 
 # remove shebang
@@ -58,27 +65,48 @@ sed -i -e '1d' %{name}/setup_templates/manage.py
   's:\(.*/locale/\)\([^/_]\+\)\(.*\.mo$\):%lang(\2) \1\2\3:' \
   >> %{name}.lang
 
-#  add wsgi and httpd configuration files 
-mkdir -p %{buildroot}/%{_sbindir}/
+# add /etc/askbot, wsgi and httpd configuration files 
+install -d %{buildroot}/%{_sbindir}/
 install -p -m 755 %{SOURCE1} %{buildroot}%{_sbindir}/
 
-mkdir -p %{buildroot}/%{_sysconfdir}/%{name}
-cp -r %{buildroot}/%{python_sitelib}/%{name}/setup_templates/  %{buildroot}/%{_sysconfdir}/%{name}
+rm -rf  %{buildroot}/%{python_sitelib}/%{name}/setup_templates/{upfiles,log}
+rm -rf  %{buildroot}/%{python_sitelib}/%{name}/upfiles
 
-mkdir -p %{buildroot}/%{_sysconfdir}/httpd/conf.d/
-install -p -m 644 %{SOURCE2} %{buildroot}/%{_sysconfdir}/httpd/conf.d/askbot.conf
+install -p -m 644 %{SOURCE2} %{buildroot}/%{python_sitelib}/%{name}/setup_templates/settings.py
+install -d %{buildroot}/%{_sysconfdir}/%{name}/setup_templates
+cp -r %{buildroot}/%{python_sitelib}/%{name}/setup_templates/* \
+          %{buildroot}/%{_sysconfdir}/%{name}/setup_templates
+
+install -d %{buildroot}/%{_sysconfdir}/%{name}/sites/ask/config
+cp -r %{buildroot}/%{python_sitelib}/%{name}/setup_templates/* \
+          %{buildroot}/%{_sysconfdir}/%{name}/sites/ask/config
+
+sed -i 's/@SITENAME@/ask/g' %{buildroot}/%{_sysconfdir}/%{name}/sites/ask/config/settings.py
+sed -i 's/postgresql_psycopg2/sqlite3/' %{buildroot}/%{_sysconfdir}/%{name}/sites/ask/config/settings.py
+sed -i 's/@DATABASENAME@/\/var\/lib\/askbot\/ask.sqlite/g' %{buildroot}/%{_sysconfdir}/%{name}/sites/ask/config/settings.py
+
+
+install -d %{buildroot}/%{_sysconfdir}/httpd/conf.d/
+install -p -m 644 %{SOURCE3} %{buildroot}/%{_sysconfdir}/httpd/conf.d/askbot.conf
 %if 0%{?rhel}
 sed -i 's/python2.7/python2.6/g' %{buildroot}/%{_sysconfdir}/httpd/conf.d/askbot.conf
 %endif
 
+install -d %{buildroot}/%{_localstatedir}/log/%{name}
+install -d %{buildroot}/%{_sharedstatedir}/%{name}/upfiles/ask
+install -p -m 644 %{SOURCE4} .
+
 %files -f %{name}.lang 
-%doc PKG-INFO LICENSE COPYING AUTHORS README.rst
+%doc PKG-INFO LICENSE COPYING AUTHORS README.rst README.fedora
 %{_bindir}/askbot-setup
 
 %{_sbindir}/askbot.wsgi
-%config(noreplace) %{_sysconfdir}/askbot/
-%config(noreplace) %{_sysconfdir}/httpd/conf.d/askbot.conf
-
+%dir %{_sysconfdir}/%{name}
+%config(noreplace)     %{_sysconfdir}/%{name}/setup_templates
+%config(noreplace) %attr(-,apache,apache) %{_sysconfdir}/%{name}/sites
+%config(noreplace)     %{_sysconfdir}/httpd/conf.d/askbot.conf
+%attr(-,apache,apache) %{_localstatedir}/log/%{name}/
+%attr(-,apache,apache) %{_sharedstatedir}/%{name}/
 %dir %{python_sitelib}/%{name}/
 %dir %{python_sitelib}/%{name}/locale/
 %{python_sitelib}/%{name}/doc
@@ -112,12 +140,17 @@ sed -i 's/python2.7/python2.6/g' %{buildroot}/%{_sysconfdir}/httpd/conf.d/askbot
 %{python_sitelib}/%{name}/patches/
 %{python_sitelib}/%{name}/search/
 %{python_sitelib}/%{name}/user_messages/
-%{python_sitelib}/%{name}/upfiles/
 %{python_sitelib}/askbot*.egg-info
 
 %changelog
+* Fri Sep 02 2011 Rahul Sundaram <sundaram@fedoraproject.org> - 0.7.22-3
+- if RHEL, then depend on python-dateutil15 instead of python-dateutil
+- add README.fedora and configuration files for multi-site deployment
+- update wsgi, apache httpd configuration and settings.py setup template
+- thanks to Toshio Kuriotami for suggesting and reviewing the changes
+
 * Fri Sep 02 2011 Rahul Sundaram <sundaram@fedoraproject.org> - 0.7.22-2
-- Fix copying of template files
+- fix copying of template files
 
 * Thu Sep 01 2011 Rahul Sundaram <sundaram@fedoraproject.org> - 0.7.22-1
 - update to 0.7.22

@@ -8,3 +8,5 @@
 /askbot-0.7.22.tar.gz
 /askbot-httpd.conf
 /askbot.wsgi
+/README.fedora
+/askbot-settings.py
