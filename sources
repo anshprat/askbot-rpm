@@ -1,5 +1,5 @@
-1fa87f68dfa9a8bc10e43ba2afa61a86  askbot-httpd.conf
 79d409e85d3e4e06f874ec66ea8b3eb4  askbot-settings.py
 d3e89396688d6af837b2b95decd71270  askbot.wsgi
 dc7de4340addba734f1d155f0a6414de  README.fedora
-a73b78f29e792e8e6af247d8e8034ab9  askbot-0.7.22.tar.gz
+1e1e248545c17680dd692b9d9c544ea0  askbot-0.7.23.tar.gz
+4f900099d19e74b8a337443915fcd4a3  askbot-httpd.conf

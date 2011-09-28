@@ -1,8 +1,8 @@
 Name:           askbot
-Version:        0.7.22
-Release:        3%{?dist}
+Version:        0.7.23
+Release:        1%{?dist}
 Summary:        Question and Answer forum
-Group:          Development/Languages
+Group:          Applications/Publishing
 License:        GPLv3+
 URL:            http://askbot.org
 Source0:        http://pypi.python.org/packages/source/a/%{name}/%{name}-%{version}.tar.gz
@@ -18,14 +18,19 @@ Requires:       django-keyedcache django-robots django-countries
 Requires:       django-kombu django-threaded-multihost 
 Requires:       python-html5lib python-oauth2 python-coffin python-markdown2  
 Requires:       python-recaptcha-client MySQL-python python-openid python-amqplib
-Requires:       python-unidecode python-httplib2 python-psycopg2
-Requires:       django-recaptcha-works django-picklefield
+Requires:       python-unidecode python-httplib2 python-psycopg2 python-akismet
+Requires:       python-multi-registry python-import-utils python-wordpress-xmlrpc
+Requires:       django-recaptcha-works django-picklefield 
+Requires:       django-extra-form-fields django-authenticator = 0.1.4
+
 # optional dependencies 
 Requires:       django-followit django-avatar
 # for building the doc
 Requires:       python-sphinx
+
 Requires:       django-celery = 2.2.7
 Requires:       httpd
+
 %if 0%{?rhel}
 Requires:       python-dateutil15
 %else
@@ -33,8 +38,7 @@ Requires:       python-dateutil
 %endif
 
 %description
-Question and Answer forum written in python and Django. It is similar to 
-Stack Overflow or Yahoo Answers. 
+Question and answer forum written in python and django. 
 
 Features:
 
@@ -143,6 +147,18 @@ install -p -m 644 %{SOURCE4} .
 %{python_sitelib}/askbot*.egg-info
 
 %changelog
+* Wed Sep 28 2011 Rahul Sundaram <sundaram@fedoraproject.org> - 0.7.23-1
+- fix group and description
+- update httpd configuration for upfiles
+- update to 0.7.33
+  * greeting for anonymous users can be changed from live settings (Hrishi)
+  * greeting for anonymous users is shown only once (Rag Sagar)
+  * added support for akismet spam detection service (Adolfo Fitoria)
+  * added noscript message (Arun SAG)
+  * support for url shortening with tinyurl on link sharing (Rtnpro)
+  * allowed logging in with password and email in the place of login name (Evgeny)
+  * added config settings allowing adjusting of license information (Evgeny)
+
 * Fri Sep 02 2011 Rahul Sundaram <sundaram@fedoraproject.org> - 0.7.22-3
 - if RHEL, then depend on python-dateutil15 instead of python-dateutil
 - add README.fedora and configuration files for multi-site deployment
