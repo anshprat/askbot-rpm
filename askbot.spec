@@ -1,5 +1,5 @@
 Name:           askbot
-Version:        0.7.23
+Version:        0.7.24
 Release:        1%{?dist}
 Summary:        Question and Answer forum
 Group:          Applications/Publishing
@@ -118,7 +118,8 @@ install -p -m 644 %{SOURCE4} .
 %{python_sitelib}/%{name}/bin/
 %{python_sitelib}/%{name}/conf/
 %{python_sitelib}/%{name}/const/
-%{python_sitelib}/%{name}/cron/
+%{python_sitelib}/%{name}/cron
+%{python_sitelib}/%{name}/db
 %{python_sitelib}/%{name}/deployment/
 %{python_sitelib}/%{name}/skins/
 %{python_sitelib}/%{name}/templatetags/
@@ -147,10 +148,16 @@ install -p -m 644 %{SOURCE4} .
 %{python_sitelib}/askbot*.egg-info
 
 %changelog
+* Tue Oct 04 2011 Rahul Sundaram <sundaram@fedoraproject.org> - 0.7.24-1
+- update to 0.7.24
+  * made it possible to disable the anonymous user greeting altogether (Raghu Udiyar)
+  * added annotations for the meanings of user levels on the "moderation" page. (Jishnu)
+  * auto-link patterns - e.g. to bug databases - are configurable from settings. (Arun SAG)
+
 * Wed Sep 28 2011 Rahul Sundaram <sundaram@fedoraproject.org> - 0.7.23-1
 - fix group and description
 - update httpd configuration for upfiles
-- update to 0.7.33
+- update to 0.7.23
   * greeting for anonymous users can be changed from live settings (Hrishi)
   * greeting for anonymous users is shown only once (Rag Sagar)
   * added support for akismet spam detection service (Adolfo Fitoria)
