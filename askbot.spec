@@ -1,5 +1,5 @@
 Name:           askbot
-Version:        0.7.24
+Version:        0.7.25
 Release:        1%{?dist}
 Summary:        Question and Answer forum
 Group:          Applications/Publishing
@@ -148,6 +148,13 @@ install -p -m 644 %{SOURCE4} .
 %{python_sitelib}/askbot*.egg-info
 
 %changelog
+* Tue Oct 06 2011 Rahul Sundaram <sundaram@fedoraproject.org> - 0.7.25-1
+- update to 0.7.25
+  * RSS feed for individual question (Sayan Chowdhury)
+  * allow pre-population of tags via ask a questions link (Adolfo)
+  * make answering own question one click harder (Adolfo)
+  * bootstrap mode (Adolfo, Evgeny)
+
 * Tue Oct 04 2011 Rahul Sundaram <sundaram@fedoraproject.org> - 0.7.24-1
 - update to 0.7.24
   * made it possible to disable the anonymous user greeting altogether (Raghu Udiyar)
