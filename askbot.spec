@@ -1,5 +1,5 @@
 Name:           askbot
-Version:        0.7.25
+Version:        0.7.27
 Release:        1%{?dist}
 Summary:        Question and Answer forum
 Group:          Applications/Publishing
@@ -20,7 +20,7 @@ Requires:       python-html5lib python-oauth2 python-coffin python-markdown2
 Requires:       python-recaptcha-client MySQL-python python-openid python-amqplib
 Requires:       python-unidecode python-httplib2 python-psycopg2 python-akismet
 Requires:       python-multi-registry python-import-utils python-wordpress-xmlrpc
-Requires:       django-recaptcha-works django-picklefield 
+Requires:       django-recaptcha-works django-picklefield pystache
 Requires:       django-extra-form-fields django-authenticator = 0.1.4
 
 # optional dependencies 
@@ -52,8 +52,9 @@ Features:
 %prep
 %setup -q 
 
-# remove empty file
+# remove empty files
 rm -rf %{name}/doc/build/html/.buildinfo
+rm -rf %{name}/db
 
 # remove shebang
 sed -i -e '1d' %{name}/setup_templates/manage.py
@@ -119,7 +120,6 @@ install -p -m 644 %{SOURCE4} .
 %{python_sitelib}/%{name}/conf/
 %{python_sitelib}/%{name}/const/
 %{python_sitelib}/%{name}/cron
-%{python_sitelib}/%{name}/db
 %{python_sitelib}/%{name}/deployment/
 %{python_sitelib}/%{name}/skins/
 %{python_sitelib}/%{name}/templatetags/
@@ -148,6 +148,21 @@ install -p -m 644 %{SOURCE4} .
 %{python_sitelib}/askbot*.egg-info
 
 %changelog
+* Wed Nov 09 2011 Rahul Sundaram <sundaram@fedoraproject.org> - 0.7.27-1
+- update to 0.7.27
+  * implemented new version of skin (Byron Corrales)
+  * show unused vote count (Tomasz Zielinski)
+  * categorized live settings (Evgeny)
+  * added management command ``send_accept_answer_reminders`` (Evgeny)
+  * improved the ``askbot-setup`` script (Adolfo, Evgeny)
+  * merge users management command (Daniel Mican)
+  * anonymous caching of the question page (Vlad Bokov)
+- 0.7.26 
+  * added settings for email subscription defaults (Adolfo)
+  * resolved duplicate notifications on posts with mentions (Evegeny)
+  * added color-animated transitions when urls with hash tags are visited (Adolfo)
+  * repository tags will be 'automatically added' to new releases (Evgeny)
+
 * Tue Oct 06 2011 Rahul Sundaram <sundaram@fedoraproject.org> - 0.7.25-1
 - update to 0.7.25
   * RSS feed for individual question (Sayan Chowdhury)
