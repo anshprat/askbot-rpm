@@ -1,5 +1,5 @@
 Name:           askbot
-Version:        0.7.27
+Version:        0.7.29
 Release:        1%{?dist}
 Summary:        Question and Answer forum
 Group:          Applications/Publishing
@@ -148,6 +148,10 @@ install -p -m 644 %{SOURCE4} .
 %{python_sitelib}/askbot*.egg-info
 
 %changelog
+* Tue Nov 15 2011 Rahul Sundaram <sundaram@fedoraproject.org> - 0.7.29-1
+- update to 0.7.29
+  * minor bug fixes and additional tests (Evgeny, Adolfo)
+
 * Wed Nov 09 2011 Rahul Sundaram <sundaram@fedoraproject.org> - 0.7.27-1
 - update to 0.7.27
   * implemented new version of skin (Byron Corrales)
