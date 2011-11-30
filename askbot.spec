@@ -1,5 +1,5 @@
 Name:           askbot
-Version:        0.7.29
+Version:        0.7.32
 Release:        1%{?dist}
 Summary:        Question and Answer forum
 Group:          Applications/Publishing
@@ -148,6 +148,35 @@ install -p -m 644 %{SOURCE4} .
 %{python_sitelib}/askbot*.egg-info
 
 %changelog
+* Wed Nov 30 2011 Rahul Sundaram <sundaram@fedoraproject.org> - 0.7.32-1
+- update to 0.7.32
+  * Bugfixes in English locale (Evgeny)
+- 0.7.31 
+  * Added ``askbot_create_test_fixture`` management command (Dejan Noveski)
+  * Integrated new test fixture into the page load test cases (Dejan Noveski)
+  * Added an embeddable widget for the questions list matching tags (Daniel Mican, Evgeny Fadeev, Dejan Noveski)
+- 0.7.30
+  * Context-sensitive RSS url (Dejan Noveski)
+  * Implemented new version of skin (Byron Corrales)
+  * Show unused vote count (Tomasz Zielinski)
+  * Categorized live settings (Evgeny)
+  * Merge users management command (Daniel Mican)
+  * Added management command ``send_accept_answer_reminders`` (Evgeny)
+  * Improved the ``askbot-setup`` script (Adolfo, Evgeny)
+  * Merge users management command (Daniel Mican)
+  * Anonymous caching of the question page (Vlad Bokov)
+  * Fixed sharing button bug, css fixes for new template (Alexander Werner)
+  * Added ASKBOT_TRANSLATE_URL setting for url localization(Alexander Werner)
+  * Changed javascript translation model, moved from jqueryi18n to django (Rosandra Cuello Suñol)
+  * Private forum mode (Vlad Bokov)
+  * Improved text search query in Postgresql (Alexander Werner)
+  * Take LANGUAGE_CODE from request (Alexander Werner)
+  * Added support for LOGIN_REDIRECT_URL to the login app (hjwp, Evgeny)
+  * Updated Italian localization (Luca Ferroni)
+  * Added Catalan localization (Jordi Bofill)
+  * Added management command ``askbot_add_test_content`` (Dejan Noveski)
+  * Continued work on refactoring the database schema (Tomasz Zielinski)
+
 * Tue Nov 15 2011 Rahul Sundaram <sundaram@fedoraproject.org> - 0.7.29-1
 - update to 0.7.29
   * minor bug fixes and additional tests (Evgeny, Adolfo)
