@@ -1,5 +1,5 @@
 Name:           askbot
-Version:        0.7.32
+Version:        0.7.33
 Release:        1%{?dist}
 Summary:        Question and Answer forum
 Group:          Applications/Publishing
@@ -148,6 +148,15 @@ install -p -m 644 %{SOURCE4} .
 %{python_sitelib}/askbot*.egg-info
 
 %changelog
+* Thu Dec 08 2011 Rahul Sundaram <sundaram@fedoraproject.org> - 0.7.33-1
+- update to 0.7.33
+  * Made on log in redirect to the forum index page by default
+    and to the question page, if user was reading the question
+    it is still possible to override the ``next`` url parameter
+    or just rely on django's ``LOGIN_REDIRECT_URL`` (Evgeny)
+  * Implemented retraction of offensive flags (Dejan Noveski)
+  * Made automatic dependency checking more complete (Evgeny
+
 * Wed Nov 30 2011 Rahul Sundaram <sundaram@fedoraproject.org> - 0.7.32-1
 - update to 0.7.32
   * Bugfixes in English locale (Evgeny)
