@@ -1,5 +1,5 @@
 Name:           askbot
-Version:        0.7.34
+Version:        0.7.36
 Release:        1%{?dist}
 Summary:        Question and Answer forum
 Group:          Applications/Publishing
@@ -149,6 +149,14 @@ install -p -m 644 %{SOURCE4} .
 %{python_sitelib}/askbot*.egg-info
 
 %changelog
+* Thu Dec 22 2011 Rahul Sundaram <sundaram@fedoraproject.org> - 0.7.36-1
+- update to 0.7.36
+  * bugfix and made the logo not used by default
+- 0.7.35
+  * Removal of offensive flags (Dejan Noveski)
+  * Fixes in CSS (Byron Corrales)
+  * Update of Catalan locale (Jordi Bofill)
+
 * Sun Dec 11 2011 Rahul Sundaram <sundaram@fedoraproject.org> - 0.7.34-1
 - update to 0.7.34
   * Returned support of Django 1.2 (Evgeny)
