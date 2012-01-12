@@ -1,6 +1,6 @@
 Name:           askbot
 Version:        0.7.36
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Question and Answer forum
 Group:          Applications/Publishing
 License:        GPLv3+
@@ -149,6 +149,9 @@ install -p -m 644 %{SOURCE4} .
 %{python_sitelib}/askbot*.egg-info
 
 %changelog
+* Thu Jan 12 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.7.36-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_17_Mass_Rebuild
+
 * Thu Dec 22 2011 Rahul Sundaram <sundaram@fedoraproject.org> - 0.7.36-1
 - update to 0.7.36
   * bugfix and made the logo not used by default
