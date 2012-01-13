@@ -1,6 +1,6 @@
 Name:           askbot
-Version:        0.7.36
-Release:        2%{?dist}
+Version:        0.7.39
+Release:        1%{?dist}
 Summary:        Question and Answer forum
 Group:          Applications/Publishing
 License:        GPLv3+
@@ -149,8 +149,28 @@ install -p -m 644 %{SOURCE4} .
 %{python_sitelib}/askbot*.egg-info
 
 %changelog
-* Thu Jan 12 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.7.36-2
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_17_Mass_Rebuild
+* Sat Jan 14 2012 Rahul Sundaram <sundaram@fedoraproject.org> - 0.7.39-1
+- update to 0.7.39
+  * restored facebook login after FB changed the procedure (Evgeny)
+- update to 0.7.38
+  * xss vulnerability fix, issue found by Radim Řehůřek (Evgeny)
+- update to 0.7.37 
+  * added basic slugification treatment to question titles with 
+    ``ALLOW_UNICODE_SLUGS = True`` (Evgeny)
+  * added verification of the project directory name to
+    make sure it does not contain a `.` (dot) symbol (Evgeny)
+  * made askbot compatible with django's `CSRFViewMiddleware`
+    that may be used for other projects (Evgeny)
+  * added more rigorous test for the user name to make it slug safe (Evgeny)
+  * made setting `ASKBOT_FILE_UPLOAD_DIR` work (Radim Řehůřek)
+  * added minimal length of question title ond body
+    text to live settings and allowed body-less questions (Radim Řehůřek, Evgeny)
+  * allowed disabling use of gravatar site-wide (Rosandra Cuello Suñol)
+  * when internal login app is disabled - links to login/logout/add-remove-login-methods are gone (Evgeny)
+  * replaced setting `ASKBOT_FILE_UPLOAD_DIR` with django's `MEDIA_ROOT` (Evgeny)
+  * replaced setting `ASKBOT_UPLOADED_FILES_URL` with django's `MEDIA_URL` (Evgeny)
+  * allowed changing file storage backend for file uploads by configuration (Evgeny)
+  * file uploads to amazon S3 now work with proper configuration (Evgeny)
 
 * Thu Dec 22 2011 Rahul Sundaram <sundaram@fedoraproject.org> - 0.7.36-1
 - update to 0.7.36
