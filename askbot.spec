@@ -1,5 +1,5 @@
 Name:           askbot
-Version:        0.7.39
+Version:        0.7.40
 Release:        1%{?dist}
 Summary:        Question and Answer forum
 Group:          Applications/Publishing
@@ -149,6 +149,33 @@ install -p -m 644 %{SOURCE4} .
 %{python_sitelib}/askbot*.egg-info
 
 %changelog
+* Mon Apr 16 2012 Rahul Sundaram <sundaram@fedoraproject.org> - 0.7.40-1
+- update to 0.7.40
+  * New data models!!! (`Tomasz Zieliński <http://pyconsultant.eu>`_)
+  * Made email recovery link work when askbot is deployed on subdirectory (Evgeny)
+  * Added tests for the CSRF_COOKIE_DOMAIN setting in the startup_procedures (Evgeny)
+  * Askbot now respects django's staticfiles app (Radim Řehůřek, Evgeny)
+  * Fixed the url translation bug (Evgeny)
+  * Added left sidebar option (Evgeny)
+  * Added "help" page and links to in the header and the footer (Evgeny)
+  * Removed url parameters and the hash fragment from uploaded files -
+    amazon S3 for some reason adds weird expiration parameters (Evgeny)
+  * Reduced memory usage in data migrations (Evgeny)
+  * Added progress bars to slow data migrations (Evgeny)
+  * Added a management command to build_thread_summary_cache (Evgeny)
+  * Added a management delete_contextless_badge_award_activities (Evgeny)
+  * Fixed a file upload issue in FF and IE found by jerry_gzy (Evgeny)
+  * Added test on maximum length of title working for utf-8 text (Evgeny)
+  * Added caching and invalidation to the question page (Evgeny)
+  * Added a management command delete_contextless_activities (Evgeny)
+  * LDAP login configuration (github user `monkut <https://github.com/monkut>`_)
+  * Check order of middleware classes (Daniel Mican)
+  * Added "reply by email" function (`Vasil Vangelovski <http://www.atomidata.com>`_)
+  * Enabled "ask by email" via Lamson (Evgeny)
+  * Tags can be optional (Evgeny)
+  * Fixed dependency of Django up to 1.3.1, because settings must be upgraded
+    for Django 1.4 (Evgeny)
+
 * Sat Jan 14 2012 Rahul Sundaram <sundaram@fedoraproject.org> - 0.7.39-1
 - update to 0.7.39
   * restored facebook login after FB changed the procedure (Evgeny)
