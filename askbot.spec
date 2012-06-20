@@ -1,6 +1,6 @@
 Name:           askbot
 Version:        0.7.40
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Question and Answer forum
 Group:          Applications/Publishing
 License:        GPLv3+
@@ -21,7 +21,7 @@ Requires:       python-recaptcha-client MySQL-python python-openid python-amqpli
 Requires:       python-unidecode python-httplib2 python-psycopg2 python-akismet
 Requires:       python-multi-registry python-import-utils python-wordpress-xmlrpc
 Requires:       django-recaptcha-works django-picklefield pystache
-Requires:       django-extra-form-fields django-authenticator = 0.1.4
+Requires:       django-extra-form-fields django-authenticator
 
 # optional dependencies 
 Requires:       django-followit django-avatar
@@ -149,6 +149,9 @@ install -p -m 644 %{SOURCE4} .
 %{python_sitelib}/askbot*.egg-info
 
 %changelog
+* Wed Jun 20 2012 Matthias Runge <mrunge@matthias-runge.de> - 0.7.40-2
+- fix dependency on authenticator (bz. 829646)
+
 * Mon Apr 16 2012 Rahul Sundaram <sundaram@fedoraproject.org> - 0.7.40-1
 - update to 0.7.40
   * New data models!!! (`Tomasz Zieliński <http://pyconsultant.eu>`_)
