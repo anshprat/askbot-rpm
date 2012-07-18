@@ -1,6 +1,6 @@
 Name:           askbot
 Version:        0.7.40
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Question and Answer forum
 Group:          Applications/Publishing
 License:        GPLv3+
@@ -149,6 +149,9 @@ install -p -m 644 %{SOURCE4} .
 %{python_sitelib}/askbot*.egg-info
 
 %changelog
+* Wed Jul 18 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.7.40-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
+
 * Wed Jun 20 2012 Matthias Runge <mrunge@matthias-runge.de> - 0.7.40-2
 - fix dependency on authenticator (bz. 829646)
 
