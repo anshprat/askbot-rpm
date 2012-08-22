@@ -1,6 +1,6 @@
 Name:           askbot
 Version:        0.7.40
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Question and Answer forum
 Group:          Applications/Publishing
 License:        GPLv3+
@@ -13,22 +13,22 @@ Source4:        README.fedora
 BuildArch:      noarch
 BuildRequires:  python-setuptools python-devel gettext
 
-Requires:       Django Django-south  
-Requires:       django-keyedcache django-robots django-countries 
-Requires:       django-kombu django-threaded-multihost 
+Requires:       python-django python-django-south  
+Requires:       python-django-keyedcache python-django-robots python-django-countries 
+Requires:       python-django-kombu python-django-threaded-multihost 
 Requires:       python-html5lib python-oauth2 python-coffin python-markdown2  
 Requires:       python-recaptcha-client MySQL-python python-openid python-amqplib
 Requires:       python-unidecode python-httplib2 python-psycopg2 python-akismet
 Requires:       python-multi-registry python-import-utils python-wordpress-xmlrpc
-Requires:       django-recaptcha-works django-picklefield pystache
-Requires:       django-extra-form-fields django-authenticator
+Requires:       python-django-recaptcha-works python-django-picklefield pystache
+Requires:       python-django-extra-form-fields python-django-authenticator
 
 # optional dependencies 
-Requires:       django-followit django-avatar
+Requires:       python-django-followit django-avatar
 # for building the doc
 Requires:       python-sphinx
 
-Requires:       django-celery = 2.2.7
+Requires:       python-django-celery = 2.2.7
 Requires:       httpd
 
 %if 0%{?rhel}
@@ -149,6 +149,9 @@ install -p -m 644 %{SOURCE4} .
 %{python_sitelib}/askbot*.egg-info
 
 %changelog
+* Wed Aug 22 2012 Parag Nemade <paragn AT fedoraproject DOT org> - 0.7.40-4
+- Change Requires that got renamed django-* to python-django-*
+
 * Wed Jul 18 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.7.40-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
 
