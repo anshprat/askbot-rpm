@@ -1,6 +1,6 @@
 Name:           askbot
 Version:        0.7.40
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Question and Answer forum
 Group:          Applications/Publishing
 License:        GPLv3+
@@ -28,7 +28,7 @@ Requires:       python-django-followit django-avatar
 # for building the doc
 Requires:       python-sphinx
 
-Requires:       python-django-celery = 2.2.7
+Requires:       python-django-celery
 Requires:       httpd
 
 %if 0%{?rhel}
@@ -149,6 +149,9 @@ install -p -m 644 %{SOURCE4} .
 %{python_sitelib}/askbot*.egg-info
 
 %changelog
+* Wed Aug 22 2012 Parag Nemade <paragn AT fedoraproject DOT org> - 0.7.40-5
+- Hardcoding versioned Requires is not recommended
+
 * Wed Aug 22 2012 Parag Nemade <paragn AT fedoraproject DOT org> - 0.7.40-4
 - Change Requires that got renamed django-* to python-django-*
 
