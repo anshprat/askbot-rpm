@@ -3,9 +3,11 @@ import os.path
 import logging
 import sys
 import askbot
+import site
 
 #this line is added so that we can import pre-packaged askbot dependencies
-sys.path.append(os.path.join(os.path.dirname(askbot.__file__), 'deps'))
+ASKBOT_ROOT = os.path.abspath(os.path.dirname(askbot.__file__))
+site.addsitedir(os.path.join(ASKBOT_ROOT, 'deps'))
 
 DEBUG = False#set to True to enable debugging
 TEMPLATE_DEBUG = False#keep false when debugging jinja2 templates
@@ -17,12 +19,19 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
-DATABASE_ENGINE = 'postgresql_psycopg2' # only postgres (>8.3) and mysql are supported so far others have not been tested yet
-DATABASE_NAME = '@DATABASENAME@'             # Or path to database file if using sqlite3.
-DATABASE_USER = ''             # Not used with sqlite3.
-DATABASE_PASSWORD = ''         # Not used with sqlite3.
-DATABASE_HOST = ''             # Set to empty string for localhost. Not used with sqlite3.
-DATABASE_PORT = ''             # Set to empty string for default. Not used with sqlite3.
+# By default, we use a sqlite database.  Other dbs are possible.
+DATABASES = {
+    'default': {
+        # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
+        'ENGINE': 'django.db.backends.sqlite3',
+        # Or path to database file if using sqlite3.
+        'NAME': '/var/cache/askbot/askbot.db',
+        'USER': '',                      # Not used with sqlite3.
+        'PASSWORD': '',                  # Not used with sqlite3.
+        'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
+        'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+    }
+}
 
 #outgoing mail server settings
 SERVER_EMAIL = ''
@@ -66,31 +75,34 @@ SITE_ID = 1
 USE_I18N = True
 LANGUAGE_CODE = 'en'
 
-# Absolute path to the directory that holds media.
+# Absolute path to the directory that holds uploaded media
 # Example: "/home/media/media.lawrence.com/"
-ASKBOT_FILE_UPLOAD_DIR = '/var/lib/askbot/upfiles/@SITENAME@'
+MEDIA_ROOT = os.path.join(os.path.dirname(__file__), 'askbot', 'upfiles')
+MEDIA_URL = '/upfiles/'
+STATIC_URL = '/m/'#this must be different from MEDIA_URL
+
 PROJECT_ROOT = os.path.dirname(__file__)
 
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
 # trailing slash.
 # Examples: "http://foo.com/media/", "/media/".
-ADMIN_MEDIA_PREFIX = '/admin/media/'
+ADMIN_MEDIA_PREFIX = STATIC_URL + 'admin/'
 
 # Make up some unique string, and don't share it with anybody.
-SECRET_KEY = 'sdljdfjkldsflsdjkhsjkldgjlsdgfs s ' 
+SECRET_KEY = 'c1cfe750f9bcea3f5b6a6dfc2e910d2q'
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
-    'django.template.loaders.filesystem.load_template_source',
-    'django.template.loaders.app_directories.load_template_source',
-    #below is askbot stuff for this tuple
-    'askbot.skins.loaders.load_template_source',
+    'askbot.skins.loaders.Loader',
+    'django.template.loaders.app_directories.Loader',
+    'django.template.loaders.filesystem.Loader',
     #'django.template.loaders.eggs.load_template_source',
 )
 
 
 MIDDLEWARE_CLASSES = (
     #'django.middleware.gzip.GZipMiddleware',
+    #'askbot.middleware.locale.LocaleMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     #'django.middleware.cache.UpdateCacheMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -100,7 +112,7 @@ MIDDLEWARE_CLASSES = (
 
     #below is askbot stuff for this tuple
     'askbot.middleware.anon_user.ConnectToSessionMessagesMiddleware',
-    'askbot.middleware.pagesize.QuestionsPageSizeMiddleware',
+    'askbot.middleware.forum_mode.ForumModeMiddleware',
     'askbot.middleware.cancel.CancelActionMiddleware',
     'django.middleware.transaction.TransactionMiddleware',
     #'debug_toolbar.middleware.DebugToolbarMiddleware',
@@ -128,7 +140,7 @@ DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 
 
 #TEMPLATE_DIRS = (,) #template have no effect in askbot, use the variable below
-#ASKBOT_EXTRA_SKIN_DIR = #path to your private skin collection
+#ASKBOT_EXTRA_SKINS_DIR = #path to your private skin collection
 #take a look here http://askbot.org/en/question/207/
 
 TEMPLATE_CONTEXT_PROCESSORS = (
@@ -136,22 +148,26 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'askbot.context.application_settings',
     #'django.core.context_processors.i18n',
     'askbot.user_messages.context_processors.user_messages',#must be before auth
-    'django.core.context_processors.auth', #this is required for admin
+    'django.contrib.auth.context_processors.auth', #this is required for the admin app
     'django.core.context_processors.csrf', #necessary for csrf protection
 )
 
 
 INSTALLED_APPS = (
+    'longerusername',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.sites',
+    'django.contrib.staticfiles',
 
     #all of these are needed for the askbot
     'django.contrib.admin',
     'django.contrib.humanize',
     'django.contrib.sitemaps',
     #'debug_toolbar',
+    #Optional, to enable haystack search
+    #'haystack',
     'askbot',
     'askbot.deps.django_authopenid',
     #'askbot.importers.stackexchange', #se loader
@@ -163,8 +179,9 @@ INSTALLED_APPS = (
     'djcelery',
     'djkombu',
     'followit',
+    'tinymce',
+    'group_messaging',
     #'avatar',#experimental use git clone git://github.com/ericflo/django-avatar.git$
-    #requires setting of MEDIA_ROOT and MEDIA_URL
 )
 
 
@@ -173,9 +190,12 @@ INSTALLED_APPS = (
 CACHE_BACKEND = 'locmem://'
 #needed for django-keyedcache
 CACHE_TIMEOUT = 6000
+#sets a special timeout for livesettings if you want to make them different
+LIVESETTINGS_CACHE_TIMEOUT = CACHE_TIMEOUT
 CACHE_PREFIX = 'askbot' #make this unique
+CACHE_MIDDLEWARE_ANONYMOUS_ONLY = True
 #If you use memcache you may want to uncomment the following line to enable memcached based sessions
-#SESSION_ENGINE = 'django.contrib.sessions.backends.cache_db'
+#SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
 
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
@@ -183,10 +203,9 @@ AUTHENTICATION_BACKENDS = (
 )
 
 #logging settings
-LOG_FILENAME = 'askbot.log'
 logging.basicConfig(
-    filename=os.path.join('/var', 'log', 'askbot', LOG_FILENAME),
-    level=logging.CRITICAL,
+    filename='/var/log/askbot/askbot.log',
+    level=logging.INFO,
     format='%(pathname)s TIME: %(asctime)s MSG: %(filename)s:%(funcName)s:%(lineno)d %(message)s',
 )
 
@@ -197,20 +216,73 @@ logging.basicConfig(
 #   ASKBOT_URL = 'forum/'
 #
 ASKBOT_URL = '' #no leading slash, default = '' empty string
+ASKBOT_TRANSLATE_URL = True #translate specific URLs
 _ = lambda v:v #fake translation function for the login url
 LOGIN_URL = '/%s%s%s' % (ASKBOT_URL,_('account/'),_('signin/'))
+LOGIN_REDIRECT_URL = ASKBOT_URL #adjust, if needed
 #note - it is important that upload dir url is NOT translated!!!
 #also, this url must not have the leading slash
-ASKBOT_UPLOADED_FILES_URL = '%s%s' % (ASKBOT_URL, 'upfiles/')
 ALLOW_UNICODE_SLUGS = False
 ASKBOT_USE_STACKEXCHANGE_URLS = False #mimic url scheme of stackexchange
 
 #Celery Settings
-BROKER_BACKEND = "djkombu.transport.DatabaseTransport"
+BROKER_TRANSPORT = "djkombu.transport.DatabaseTransport"
 CELERY_ALWAYS_EAGER = True
 
 import djcelery
 djcelery.setup_loader()
+DOMAIN_NAME = ''
 
-CSRF_COOKIE_NAME = 'askbot_scrf'
-CSRF_COOKIE_DOMAIN = ''#enter domain name here - e.g. example.com
+CSRF_COOKIE_NAME = '_csrf'
+#https://docs.djangoproject.com/en/1.3/ref/contrib/csrf/
+#CSRF_COOKIE_DOMAIN = DOMAIN_NAME
+
+STATIC_ROOT = os.path.join(ASKBOT_ROOT, "static")
+STATICFILES_DIRS = (
+    ('default/media', os.path.join(ASKBOT_ROOT, 'media')),
+)
+
+RECAPTCHA_USE_SSL = True
+
+#HAYSTACK_SETTINGS
+ENABLE_HAYSTACK_SEARCH = False
+HAYSTACK_SITECONF = 'askbot.search.haystack'
+#more information
+#http://django-haystack.readthedocs.org/en/v1.2.7/settings.html
+HAYSTACK_SEARCH_ENGINE = 'simple'
+
+TINYMCE_COMPRESSOR = True
+TINYMCE_SPELLCHECKER = False
+TINYMCE_JS_ROOT = os.path.join(STATIC_ROOT, 'default/media/js/tinymce/')
+TINYMCE_URL = STATIC_URL + 'default/media/js/tinymce/'
+TINYMCE_DEFAULT_CONFIG = {
+    'plugins': 'askbot_imageuploader,askbot_attachment',
+    'convert_urls': False,
+    'theme': 'advanced',
+    'content_css': STATIC_URL + 'default/media/style/tinymce/content.css',
+    'force_br_newlines': True,
+    'force_p_newlines': False,
+    'forced_root_block': '',
+    'mode' : 'textareas',
+    'oninit': "function(){ tinyMCE.activeEditor.setContent(askbot['data']['editorContent'] || ''); }",
+    'plugins': 'askbot_imageuploader,askbot_attachment',
+    'theme_advanced_toolbar_location' : 'top',
+    'theme_advanced_toolbar_align': 'left',
+    'theme_advanced_buttons1': 'bold,italic,underline,|,bullist,numlist,|,undo,redo,|,link,unlink,askbot_imageuploader,askbot_attachment',
+    'theme_advanced_buttons2': '',
+    'theme_advanced_buttons3' : '',
+    'theme_advanced_path': False,
+    'theme_advanced_resizing': True,
+    'theme_advanced_resize_horizontal': False,
+    'theme_advanced_statusbar_location': 'bottom',
+    'width': '723',
+    'height': '250'
+}
+
+#delayed notifications, time in seconds, 15 mins by default
+NOTIFICATION_DELAY_TIME = 60 * 15
+
+GROUP_MESSAGING = {
+    'BASE_URL_GETTER_FUNCTION': 'askbot.models.user_get_profile_url',
+    'BASE_URL_PARAMS': {'section': 'messages', 'sort': 'inbox'}
+}

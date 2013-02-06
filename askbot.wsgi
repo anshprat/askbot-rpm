@@ -1,6 +1,7 @@
 #!/usr/bin/python
 import os
 import sys
+sys.stdout = sys.stderr
 
 os.environ['DJANGO_SETTINGS_MODULE'] = 'config.settings'
 

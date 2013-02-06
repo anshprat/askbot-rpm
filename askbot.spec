@@ -1,6 +1,6 @@
 Name:           askbot
-Version:        0.7.40
-Release:        5%{?dist}
+Version:        0.7.48
+Release:        8%{?dist}
 Summary:        Question and Answer forum
 Group:          Applications/Publishing
 License:        GPLv3+
@@ -10,25 +10,76 @@ Source1:        askbot.wsgi
 Source2:        askbot-settings.py
 Source3:        askbot-httpd.conf
 Source4:        README.fedora
+
+Patch0:         askbot-remove-test-skins.patch
+Patch1:         askbot-pystache-templatespec.patch
+
 BuildArch:      noarch
 BuildRequires:  python-setuptools python-devel gettext
 
-Requires:       python-django python-django-south  
-Requires:       python-django-keyedcache python-django-robots python-django-countries 
-Requires:       python-django-kombu python-django-threaded-multihost 
-Requires:       python-html5lib python-oauth2 python-coffin python-markdown2  
-Requires:       python-recaptcha-client MySQL-python python-openid python-amqplib
-Requires:       python-unidecode python-httplib2 python-psycopg2 python-akismet
-Requires:       python-multi-registry python-import-utils python-wordpress-xmlrpc
-Requires:       python-django-recaptcha-works python-django-picklefield pystache
-Requires:       python-django-extra-form-fields python-django-authenticator
+%if 0%{?rhel}
+Requires:       Django
+Requires:       Django-south
+Requires:       django-keyedcache
+Requires:       django-robots
+Requires:       django-countries
+Requires:       django-kombu
+Requires:       django-threaded-multihost
+Requires:       django-recaptcha-works
+Requires:       django-picklefield
+Requires:       django-extra-form-fields
+Requires:       django-authenticator
+Requires:       django-celery
+Requires:       django-followit
+Requires:       django-avatar
+%else
+Requires:       python-django
+Requires:       python-django-south
+Requires:       python-django-keyedcache
+Requires:       python-django-robots
+Requires:       python-django-countries
+Requires:       python-django-kombu
+Requires:       python-django-threaded-multihost
+Requires:       python-django-recaptcha-works
+Requires:       python-django-picklefield
+Requires:       python-django-extra-form-fields
+Requires:       python-django-authenticator
+Requires:       python-django-celery
+Requires:       python-django-followit
+Requires:       python-django-avatar
+%endif
 
-# optional dependencies 
-Requires:       python-django-followit django-avatar
+Requires:       python-django-tinymce
+Requires:       python-django-longerusername
+
+Requires:       python-billiard
+Requires:       python-html5lib
+Requires:       python-oauth2
+Requires:       python-coffin
+Requires:       python-markdown2
+Requires:       python-recaptcha-client
+Requires:       python-openid
+Requires:       python-amqplib
+Requires:       python-unidecode
+Requires:       python-httplib2
+Requires:       python-akismet
+Requires:       python-multi-registry
+Requires:       python-import-utils
+Requires:       python-wordpress-xmlrpc
+Requires:       pystache
+Requires:       tinymce
+Requires:       python-beautifulsoup4
+Requires:       pytz
+Requires:       python-sanction
+Requires:       python-lamson
+
+# Database backend -- Not required; we used sqlite out of the box
+#Requires:       MySQL-python
+#Requires:       python-psycopg2
+
 # for building the doc
 Requires:       python-sphinx
 
-Requires:       python-django-celery
 Requires:       httpd
 
 %if 0%{?rhel}
@@ -37,8 +88,11 @@ Requires:       python-dateutil15
 Requires:       python-dateutil
 %endif
 
+# For setting selinux context in %%post
+Requires:       policycoreutils-python
+
 %description
-Question and answer forum written in python and django. 
+Question and answer forum written in python and django.
 
 Features:
 
@@ -50,7 +104,14 @@ Features:
    * can import data from stack-exchange database file
 
 %prep
-%setup -q 
+%setup -q
+%patch0 -p1 -b .skins
+
+%if 0%{?rhel}
+# Don't patch for pystache on rhel.  pystache is older there.
+%else
+%patch1 -p1 -b .stache
+%endif
 
 # remove empty files
 rm -rf %{name}/doc/build/html/.buildinfo
@@ -70,12 +131,16 @@ sed -i -e '1d' %{name}/setup_templates/manage.py
   's:\(.*/locale/\)\([^/_]\+\)\(.*\.mo$\):%lang(\2) \1\2\3:' \
   >> %{name}.lang
 
-# add /etc/askbot, wsgi and httpd configuration files 
+# add /etc/askbot, wsgi and httpd configuration files
 install -d %{buildroot}/%{_sbindir}/
 install -p -m 755 %{SOURCE1} %{buildroot}%{_sbindir}/
 
 rm -rf  %{buildroot}/%{python_sitelib}/%{name}/setup_templates/{upfiles,log}
 rm -rf  %{buildroot}/%{python_sitelib}/%{name}/upfiles
+
+# remove bundled tinymce.
+rm -rf  %{buildroot}/%{python_sitelib}/%{name}/media/js/tinymce
+ln -s /usr/share/tinymce/jscripts/tiny_mce %{buildroot}/%{python_sitelib}/%{name}/media/js/tinymce
 
 install -p -m 644 %{SOURCE2} %{buildroot}/%{python_sitelib}/%{name}/setup_templates/settings.py
 install -d %{buildroot}/%{_sysconfdir}/%{name}/setup_templates
@@ -85,23 +150,57 @@ cp -r %{buildroot}/%{python_sitelib}/%{name}/setup_templates/* \
 install -d %{buildroot}/%{_sysconfdir}/%{name}/sites/ask/config
 cp -r %{buildroot}/%{python_sitelib}/%{name}/setup_templates/* \
           %{buildroot}/%{_sysconfdir}/%{name}/sites/ask/config
-
-sed -i 's/@SITENAME@/ask/g' %{buildroot}/%{_sysconfdir}/%{name}/sites/ask/config/settings.py
-sed -i 's/postgresql_psycopg2/sqlite3/' %{buildroot}/%{_sysconfdir}/%{name}/sites/ask/config/settings.py
-sed -i 's/@DATABASENAME@/\/var\/lib\/askbot\/ask.sqlite/g' %{buildroot}/%{_sysconfdir}/%{name}/sites/ask/config/settings.py
-
+cp %{SOURCE2} %{buildroot}/%{_sysconfdir}/%{name}/sites/ask/config/settings.py
 
 install -d %{buildroot}/%{_sysconfdir}/httpd/conf.d/
 install -p -m 644 %{SOURCE3} %{buildroot}/%{_sysconfdir}/httpd/conf.d/askbot.conf
+
 %if 0%{?rhel}
 sed -i 's/python2.7/python2.6/g' %{buildroot}/%{_sysconfdir}/httpd/conf.d/askbot.conf
 %endif
 
 install -d %{buildroot}/%{_localstatedir}/log/%{name}
+install -d %{buildroot}/%{_localstatedir}/cache/%{name}
 install -d %{buildroot}/%{_sharedstatedir}/%{name}/upfiles/ask
 install -p -m 644 %{SOURCE4} .
 
-%files -f %{name}.lang 
+%post
+# Question -> Can selinux be managed in attr(...)?
+chcon -R -t httpd_log_t %{_localstatedir}/log/%{name}/
+chcon -R -t httpd_sys_rw_content_t %{_localstatedir}/cache/%{name}/
+
+## We may or may not want to run the %%post steps below for other users.
+#
+## First, jump into the config dir.  manage.py expects settings.py to be in cwd
+#pushd %{_sysconfdir}/%{name}/sites/ask/config/
+#
+## Gather up dynamic resources and put them in a static/ dir
+#mkdir -p %{python_sitelib}/%{name}/static/
+#echo "yes" | python manage.py collectstatic
+#
+## Make db schema updates
+#echo "no" | python manage.py syncdb
+#python manage.py migrate askbot
+#python manage.py migrate django_authopenid
+#
+#popd
+#
+## Symlink the default skin into the skins directory
+#ln -s %{python_sitelib}/%{name}/static/default \
+#    %{python_sitelib}/%{name}/skins/default
+
+# Set perm mask for httpd
+chown -R apache:apache %{_localstatedir}/log/%{name}/
+chown -R apache:apache %{_localstatedir}/cache/%{name}/
+
+#%%preun
+## These get dynamically generated in the %%post section and so don't
+## get taken care of by the %%files cleanup
+#rm -rf %{python_sitelib}/askbot/static
+#rm -rf %{python_sitelib}/askbot/skins
+#rm -rf %{python_sitelib}/askbot/locale
+
+%files -f %{name}.lang
 %doc PKG-INFO LICENSE COPYING AUTHORS README.rst README.fedora
 %{_bindir}/askbot-setup
 
@@ -111,6 +210,7 @@ install -p -m 644 %{SOURCE4} .
 %config(noreplace) %attr(-,apache,apache) %{_sysconfdir}/%{name}/sites
 %config(noreplace)     %{_sysconfdir}/httpd/conf.d/askbot.conf
 %attr(-,apache,apache) %{_localstatedir}/log/%{name}/
+%attr(-,apache,apache) %{_localstatedir}/cache/%{name}/
 %attr(-,apache,apache) %{_sharedstatedir}/%{name}/
 %dir %{python_sitelib}/%{name}/
 %dir %{python_sitelib}/%{name}/locale/
@@ -146,9 +246,41 @@ install -p -m 644 %{SOURCE4} .
 %{python_sitelib}/%{name}/patches/
 %{python_sitelib}/%{name}/search/
 %{python_sitelib}/%{name}/user_messages/
+%{python_sitelib}/%{name}/deps
+%{python_sitelib}/%{name}/mail
+%{python_sitelib}/%{name}/media
+%{python_sitelib}/%{name}/templates
 %{python_sitelib}/askbot*.egg-info
 
 %changelog
+* Tue Feb 12 2013 Ralph Bean <rbean@redhat.com> 0.7.48-8
+- Conditionalized pystache patch for el6
+- Disabled preun section.
+
+* Tue Feb 05 2013 Ralph Bean <rbean@redhat.com> 0.7.48-6
+- Conditionalized python-django* requires for el6
+- Patched some problems with askbot/startup_procedures.py
+- Updated settings.py with new needed parameters.
+- Added a commented %%post section with db upgrade path.
+- Fixed WSGI sys.stdout errors.
+
+* Mon Feb 04 2013 Ralph Bean <rbean@redhat.com> 0.7.48-4
+- Added django-longerusername as a requirement
+- Added django-tinymce as a requirement
+- Added pytz as a requirement
+- Added python-sanction as a requirement
+- Added python-lamson as a requirement
+
+* Mon Feb 04 2013 Kevin Fenzi <kevin@scrye.com> 0.7.48-1
+- Update to 0.7.48
+
+* Wed Jan 23 2013 Kevin Fenzi <kevin@scrye.com> 0.7.47-1
+- Update to 0.7.47.
+
+* Tue Dec 04 2012 Kevin Fenzi <kevin@scrye.com> 0.7.44-1
+- Update to 0.7.44.
+- See http://askbot.org/doc/changelog.html for full changes.
+
 * Wed Aug 22 2012 Parag Nemade <paragn AT fedoraproject DOT org> - 0.7.40-5
 - Hardcoding versioned Requires is not recommended
 
@@ -193,8 +325,8 @@ install -p -m 644 %{SOURCE4} .
   * restored facebook login after FB changed the procedure (Evgeny)
 - update to 0.7.38
   * xss vulnerability fix, issue found by Radim Řehůřek (Evgeny)
-- update to 0.7.37 
-  * added basic slugification treatment to question titles with 
+- update to 0.7.37
+  * added basic slugification treatment to question titles with
     ``ALLOW_UNICODE_SLUGS = True`` (Evgeny)
   * added verification of the project directory name to
     make sure it does not contain a `.` (dot) symbol (Evgeny)
@@ -235,7 +367,7 @@ install -p -m 644 %{SOURCE4} .
 * Wed Nov 30 2011 Rahul Sundaram <sundaram@fedoraproject.org> - 0.7.32-1
 - update to 0.7.32
   * Bugfixes in English locale (Evgeny)
-- 0.7.31 
+- 0.7.31
   * Added ``askbot_create_test_fixture`` management command (Dejan Noveski)
   * Integrated new test fixture into the page load test cases (Dejan Noveski)
   * Added an embeddable widget for the questions list matching tags (Daniel Mican, Evgeny Fadeev, Dejan Noveski)
@@ -274,7 +406,7 @@ install -p -m 644 %{SOURCE4} .
   * improved the ``askbot-setup`` script (Adolfo, Evgeny)
   * merge users management command (Daniel Mican)
   * anonymous caching of the question page (Vlad Bokov)
-- 0.7.26 
+- 0.7.26
   * added settings for email subscription defaults (Adolfo)
   * resolved duplicate notifications on posts with mentions (Evegeny)
   * added color-animated transitions when urls with hash tags are visited (Adolfo)
@@ -318,7 +450,7 @@ install -p -m 644 %{SOURCE4} .
 - update to 0.7.22
   * removed printing of log message on missing optional media resources (Evgeny Fadeev)
   * fixed a layout bug on tags page (Evgeny Fadeev)
- 
+
 * Thu Sep 01 2011 Rahul Sundaram <sundaram@fedoraproject.org> - 0.7.21-1
 - update to 0.7.21
   * media resource incremented automatically (Adolfo Fitoria, Evgeny Fadeev)
@@ -350,7 +482,7 @@ install -p -m 644 %{SOURCE4} .
 * Thu Aug 11 2011 Rahul Sundaram <sundaram@fedoraproject.org> - 0.7.17-1
 - new upstream release
   * fixes issue with referencing username with capitalization differences
-  * allow admins to add others as admins 
+  * allow admins to add others as admins
 - requires django-celery 2.2.7
 
 * Thu Aug 07 2011 Rahul Sundaram <sundaram@fedoraproject.org> - 0.7.15-1
@@ -360,7 +492,7 @@ install -p -m 644 %{SOURCE4} .
 - upstream dropped empty version.py file
 
 * Thu Aug 03 2011 Rahul Sundaram <sundaram@fedoraproject.org> - 0.7.14-1
-- new upstream release.  
+- new upstream release.
 - upstream has renamed startforum to askbot-setup
 - included copy of license and some documentation fixes
 - upstream removed empty files, unnecessary executable bit and shebang in files
@@ -399,7 +531,7 @@ install -p -m 644 %{SOURCE4} .
 - changes from Praveen Kumar to fix all relevant rpmlint warnings and errors
 
 * Thu Jul 14 2011 Rahul Sundaram <sundaram@fedoraproject.org> - 0.7.7-1
-- new upstream release.  
+- new upstream release.
 - split out bundled grapefruit, django recaptcha dependencies
 
 * Sun Jun 26 2011 Rahul Sundaram <sundaram@fedoraproject.org> - 0.7.1-1
