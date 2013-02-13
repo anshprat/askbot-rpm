@@ -1,6 +1,6 @@
 Name:           askbot
 Version:        0.7.40
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        Question and Answer forum
 Group:          Applications/Publishing
 License:        GPLv3+
@@ -149,6 +149,9 @@ install -p -m 644 %{SOURCE4} .
 %{python_sitelib}/askbot*.egg-info
 
 %changelog
+* Wed Feb 13 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.7.40-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_19_Mass_Rebuild
+
 * Wed Aug 22 2012 Parag Nemade <paragn AT fedoraproject DOT org> - 0.7.40-5
 - Hardcoding versioned Requires is not recommended
 
