@@ -253,6 +253,9 @@ chown -R apache:apache %{_localstatedir}/cache/%{name}/
 %{python_sitelib}/askbot*.egg-info
 
 %changelog
+* Wed Feb 13 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.7.40-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_19_Mass_Rebuild
+
 * Tue Feb 12 2013 Ralph Bean <rbean@redhat.com> 0.7.48-8
 - Conditionalized pystache patch for el6
 - Disabled preun section.
@@ -280,9 +283,6 @@ chown -R apache:apache %{_localstatedir}/cache/%{name}/
 * Tue Dec 04 2012 Kevin Fenzi <kevin@scrye.com> 0.7.44-1
 - Update to 0.7.44.
 - See http://askbot.org/doc/changelog.html for full changes.
-
-* Wed Feb 13 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.7.40-6
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_19_Mass_Rebuild
 
 * Wed Aug 22 2012 Parag Nemade <paragn AT fedoraproject DOT org> - 0.7.40-5
 - Hardcoding versioned Requires is not recommended
