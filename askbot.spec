@@ -281,6 +281,9 @@ chown -R apache:apache %{_localstatedir}/cache/%{name}/
 - Update to 0.7.44.
 - See http://askbot.org/doc/changelog.html for full changes.
 
+* Wed Feb 13 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.7.40-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_19_Mass_Rebuild
+
 * Wed Aug 22 2012 Parag Nemade <paragn AT fedoraproject DOT org> - 0.7.40-5
 - Hardcoding versioned Requires is not recommended
 
