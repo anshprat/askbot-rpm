@@ -188,6 +188,8 @@ chcon -R -t httpd_sys_rw_content_t %{_localstatedir}/cache/%{name}/
 ## Symlink the default skin into the skins directory
 #ln -s %{python_sitelib}/%{name}/static/default \
 #    %{python_sitelib}/%{name}/skins/default
+#ln -s %{python_sitelib}/%{name}/static/admin \
+#    %{python_sitelib}/%{name}/skins/admin
 
 # Set perm mask for httpd
 chown -R apache:apache %{_localstatedir}/log/%{name}/
