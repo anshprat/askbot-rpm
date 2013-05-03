@@ -1,6 +1,6 @@
 Name:           askbot
 Version:        0.7.48
-Release:        8%{?dist}
+Release:        9%{?dist}
 Summary:        Question and Answer forum
 Group:          Applications/Publishing
 License:        GPLv3+
@@ -33,7 +33,7 @@ Requires:       django-celery
 Requires:       django-followit
 Requires:       django-avatar
 %else
-Requires:       python-django
+Requires:       python-django14
 Requires:       python-django-south
 Requires:       python-django-keyedcache
 Requires:       python-django-robots
@@ -255,6 +255,9 @@ chown -R apache:apache %{_localstatedir}/cache/%{name}/
 %{python_sitelib}/askbot*.egg-info
 
 %changelog
+* Fri May 03 2013 Rahul Sundaram <sundaram@fedoraproject.org> 0.7.48-9
+- Change Requires from python-django to python-django14. Resolves rhbz#950413
+
 * Wed Feb 13 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.7.40-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_19_Mass_Rebuild
 
