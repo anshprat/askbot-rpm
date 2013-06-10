@@ -1,6 +1,6 @@
 Name:           askbot
 Version:        0.7.48
-Release:        9%{?dist}
+Release:        10%{?dist}
 Summary:        Question and Answer forum
 Group:          Applications/Publishing
 License:        GPLv3+
@@ -71,7 +71,6 @@ Requires:       tinymce
 Requires:       python-beautifulsoup4
 Requires:       pytz
 Requires:       python-sanction
-Requires:       python-lamson
 
 # Database backend -- Not required; we used sqlite out of the box
 #Requires:       MySQL-python
@@ -255,6 +254,9 @@ chown -R apache:apache %{_localstatedir}/cache/%{name}/
 %{python_sitelib}/askbot*.egg-info
 
 %changelog
+* Mon Jun 10 2013 Rahul Sundaram <sundaram@fedoraproject.org> - 0.7.48-10
+- Drop python-lamson for now since it has become non-free. c.f. rhbz#972251
+
 * Fri May 03 2013 Rahul Sundaram <sundaram@fedoraproject.org> 0.7.48-9
 - Change Requires from python-django to python-django14. Resolves rhbz#950413
 
