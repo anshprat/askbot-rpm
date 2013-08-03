@@ -1,6 +1,6 @@
 Name:           askbot
 Version:        0.7.48
-Release:        10%{?dist}
+Release:        11%{?dist}
 Summary:        Question and Answer forum
 Group:          Applications/Publishing
 License:        GPLv3+
@@ -254,6 +254,9 @@ chown -R apache:apache %{_localstatedir}/cache/%{name}/
 %{python_sitelib}/askbot*.egg-info
 
 %changelog
+* Sat Aug 03 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.7.48-11
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_20_Mass_Rebuild
+
 * Mon Jun 10 2013 Rahul Sundaram <sundaram@fedoraproject.org> - 0.7.48-10
 - Drop python-lamson for now since it has become non-free. c.f. rhbz#972251
 
