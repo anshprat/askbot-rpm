@@ -176,7 +176,7 @@ INSTALLED_APPS = (
     'keyedcache',
     'robots',
     'django_countries',
-    'djcelery',
+     #'djcelery',
     'djkombu',
     'followit',
     'tinymce',
@@ -229,8 +229,8 @@ ASKBOT_USE_STACKEXCHANGE_URLS = False #mimic url scheme of stackexchange
 BROKER_TRANSPORT = "djkombu.transport.DatabaseTransport"
 CELERY_ALWAYS_EAGER = True
 
-import djcelery
-djcelery.setup_loader()
+#import djcelery
+#djcelery.setup_loader()
 DOMAIN_NAME = ''
 
 CSRF_COOKIE_NAME = '_csrf'

@@ -1,6 +1,6 @@
 Name:           askbot
-Version:        0.7.48
-Release:        11%{?dist}
+Version:        0.7.49
+Release:        1%{?dist}
 Summary:        Question and Answer forum
 Group:          Applications/Publishing
 License:        GPLv3+
@@ -13,6 +13,11 @@ Source4:        README.fedora
 
 Patch0:         askbot-remove-test-skins.patch
 Patch1:         askbot-pystache-templatespec.patch
+Patch2:		askbot-django-celery-version.patch
+Patch3:		askbot-upfile-deploy-path.patch
+Patch4:		askbot-celery-import.patch
+Patch5:         askbot-remove-celery.patch
+Patch6:         askbot-remove-celery-mustache.patch
 
 BuildArch:      noarch
 BuildRequires:  python-setuptools python-devel gettext
@@ -29,7 +34,6 @@ Requires:       django-recaptcha-works
 Requires:       django-picklefield
 Requires:       django-extra-form-fields
 Requires:       django-authenticator
-Requires:       django-celery
 Requires:       django-followit
 Requires:       django-avatar
 %else
@@ -44,13 +48,14 @@ Requires:       python-django-recaptcha-works
 Requires:       python-django-picklefield
 Requires:       python-django-extra-form-fields
 Requires:       python-django-authenticator
-Requires:       python-django-celery
 Requires:       python-django-followit
 Requires:       python-django-avatar
 %endif
 
 Requires:       python-django-tinymce
 Requires:       python-django-longerusername
+Requires:       python-django-compressor
+Requires:       python-dateutil
 
 Requires:       python-billiard
 Requires:       python-html5lib
@@ -71,10 +76,14 @@ Requires:       tinymce
 Requires:       python-beautifulsoup4
 Requires:       pytz
 Requires:       python-sanction
+Requires:       python-chardet
+Requires:       python-nose
+Requires:       python-daemon
+#Requires:       python-lamson
 
 # Database backend -- Not required; we used sqlite out of the box
 #Requires:       MySQL-python
-#Requires:       python-psycopg2
+Requires:       python-psycopg2
 
 # for building the doc
 Requires:       python-sphinx
@@ -111,6 +120,12 @@ Features:
 %else
 %patch1 -p1 -b .stache
 %endif
+
+%patch2 -p1 -b .initpy 
+%patch3 -p1 -b .pathpy 
+%patch4 -p1 -b .modelinitpy 
+%patch5 -p1 -b .set
+%patch6 -p1 -b .setmustache
 
 # remove empty files
 rm -rf %{name}/doc/build/html/.buildinfo
@@ -236,22 +251,20 @@ chown -R apache:apache %{_localstatedir}/cache/%{name}/
 %{python_sitelib}/%{name}/deps/*.py*
 %{python_sitelib}/%{name}/deps/README
 %{python_sitelib}/%{name}/deps/django_authopenid/
-%dir %{python_sitelib}/%{name}/deps/livesettings/
-%dir %{python_sitelib}/%{name}/deps/livesettings/locale/
-%{python_sitelib}/%{name}/deps/livesettings/*.py*
-%{python_sitelib}/%{name}/deps/livesettings/README
-%{python_sitelib}/%{name}/deps/livesettings/temp*
+%{python_sitelib}/%{name}/deps/livesettings/
+%{python_sitelib}/%{name}/deps/group_messaging/
 %{python_sitelib}/%{name}/importers/
 %{python_sitelib}/%{name}/middleware/
 %{python_sitelib}/%{name}/migrations_api/
 %{python_sitelib}/%{name}/patches/
 %{python_sitelib}/%{name}/search/
 %{python_sitelib}/%{name}/user_messages/
-%{python_sitelib}/%{name}/deps
 %{python_sitelib}/%{name}/mail
 %{python_sitelib}/%{name}/media
 %{python_sitelib}/%{name}/templates
 %{python_sitelib}/askbot*.egg-info
+%{python_sitelib}/custom_settings/
+
 
 %changelog
 * Sat Aug 03 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.7.48-11
